@@ -45,7 +45,7 @@ global logger
 #logger: logging.Logger = None  # Master copy (root) of the logger
 logger = None                   # Safe on Python 3.7 but no intellisense in VSCode etc.
 
-def init_logging():
+def init_logging(stream=None):
     """ Create the logger - called at app startup
 
         **MASTER LOGGER**
@@ -71,6 +71,9 @@ def init_logging():
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d %(levelname)s %(message)s', '%Y-%m-%dT%H:%M:%S')
     formatter.converter = time.gmtime           # UTC time
     logger.handlers[0].setFormatter(formatter)  # This is the stdout handler, level set above
+    if stream:
+        handler = logging.StreamHandler(stream)
+        logger.addHandler(handler)
     # Add a logfile handler, same formatter and level
     handler = logging.handlers.RotatingFileHandler('alpyca.log',
                                                     mode='w',

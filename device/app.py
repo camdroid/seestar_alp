@@ -65,6 +65,7 @@ from falcon import Request, Response, App, HTTPInternalServerError
 import management
 import setup
 import log
+import seestar_dashboard
 from config import Config
 from discovery import DiscoveryResponder
 from shr import set_shr_logger
@@ -149,10 +150,13 @@ def init_routes(app: App, devname: str, module):
 
     """
 
+    print('Initializing routes')
     memlist = inspect.getmembers(module, inspect.isclass)
     for cname,ctype in memlist:
         if ctype.__module__ == module.__name__:    # Only classes *defined* in the module
-            app.add_route(f'/api/v{API_VERSION}/{devname}/{{devnum:int(min=0)}}/{cname.lower()}', ctype())  # type() creates instance!
+            route = f'/api/v{API_VERSION}/{devname}/{{devnum:int(min=0)}}/{cname.lower()}'
+            app.add_route(route, ctype()) # type() creates instance!
+            print(f'Adding route {route}')
 
 
 def custom_excepthook(exc_type, exc_value, exc_traceback):
@@ -213,6 +217,7 @@ def falcon_uncaught_exception_handler(req: Request, resp: Response, ex: BaseExce
 def main():
     """ Application startup"""
 
+    # logger = log.init_logging(stream=sys.stdout)
     logger = log.init_logging()
     # Share this logger throughout
     log.logger = logger
@@ -267,11 +272,19 @@ def main():
     #
     falc_app.add_error_handler(Exception, falcon_uncaught_exception_handler)
 
+    #
+    # Run a dashboard for viewing the Seestar results
+    #
+    print('Adding dashboard routes')
+    falc_app.add_route(f'/dashboard', seestar_dashboard.seestar_dashboard())
+    print('Done adding dashboard routes')
+
     # ------------------
     # SERVER APPLICATION
     # ------------------
     # Using the lightweight built-in Python wsgi.simple_server
     try:
+        print(f'Starting server with ip {Config.ip_address}:{Config.port}')
         with make_server(Config.ip_address, Config.port, falc_app, handler_class=LoggingWSGIRequestHandler) as httpd:
             logger.info(f'==STARTUP== Serving on {Config.ip_address}:{Config.port}. Time stamps are UTC.')
             # Serve until process is killed
