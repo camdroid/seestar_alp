@@ -82,22 +82,22 @@ main() {
         ASTRO_PLATFORM \
         "${SCRIPT_DIR}/../"
 
-    if [ ! -f "${SCRIPT_DIR}/config.toml" ]; then
-        echo "S{SCRIPT_DIR}/config.toml doesn't exist.  Copy and customize ${SCRIPT_DIR}/config.toml.example."
-        return 1
-    fi
-
-    if [ -z "${TIME_ZONE}" ]; then
-        echo "TIME_ZONE has not been set - see arguments in run.sh"
-        return 1
-    fi
-    
-    read -d '' DOCKER_RUN_OPTIONS <<EOM
-        --mount type=bind,source="${SCRIPT_DIR}/config.toml",target="/home/seestar/seestar_alp/device/config.toml" \
-        -p 5432:5432 \
-        -p 5555:5555 \
-        -p 7624:7624
-EOM
+#     if [ ! -f "${SCRIPT_DIR}/config.toml" ]; then
+#         echo "S{SCRIPT_DIR}/config.toml doesn't exist.  Copy and customize ${SCRIPT_DIR}/config.toml.example."
+#         return 1
+#     fi
+# 
+#     if [ -z "${TIME_ZONE}" ]; then
+#         echo "TIME_ZONE has not been set - see arguments in run.sh"
+#         return 1
+#     fi
+#     
+#     read -d '' DOCKER_RUN_OPTIONS <<EOM
+#         --mount type=bind,source="${SCRIPT_DIR}/config.toml",target="/home/seestar/seestar_alp/device/config.toml" \
+#         -p 5432:5432 \
+#         -p 5555:5555 \
+#         -p 7624:7624
+# EOM
 
 #     docker_run \
 #         SEESTAR_ALP_IMAGE_NAME \
